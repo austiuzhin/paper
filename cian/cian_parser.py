@@ -37,7 +37,7 @@ def parse(url):
 def send_to_txt(some_list):
 	for item in some_list:
 		row_text = item.get("station")  + ";" + item.get("distance") + ";" + item.get("address") + ";" + item.get("price") + ";" + item.get("rooms") + ";" \
-		+ item.get("area") + ";" + item.get("floor")
+		+ item.get("area") + ";" + item.get("floor") + ";"
 		with open("parsing_results.csv","a", encoding = "utf-8") as row:
 			row.write(row_text + "\n")
 
