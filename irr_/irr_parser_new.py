@@ -1,12 +1,24 @@
 import re
 import requests
 from bs4 import BeautifulSoup as bs_
-from IO_Ldr import into_file_
+from IO_Ldr import csv_in_file_
 
 links_for_parser = ['http://irr.ru/real-estate/apartments-sale/',
 					'http://irr.ru/real-estate/rooms-sale/',
 					'http://irr.ru/real-estate/rent/',
 					'http://irr.ru/real-estate/rooms-rent/']
+
+def real_estate_type(url_):
+	if 'apartments-sale' in url_:
+		return 'Квартира для продажи'
+	elif 'rooms-sale' in url_:
+		return 'Комната для продажи'
+	elif 'rent' in url_:
+		return 'Квартира для аренды'
+	elif 'rooms-rent' in url_:
+		return 'Комната для аренды'
+	else:
+		return 'Unknown real-estate type'
 
 def page_generator(url_):
 	for num in range(2,52):
@@ -19,7 +31,8 @@ def urls_for_items(url_):
 
 def item_parser(url_):
 	data = requests.get(url_)
-	s_data = bs_(data.text, 'lxml')
+	s_data = bs_(data.text, 'lxml')	
+	est_type = real_estate_type(url_)
 	try:
 		name = (lambda x: x.text.strip())(s_data.find("h1",{"itemprop":"name"}))
 	except:
@@ -48,7 +61,10 @@ def item_parser(url_):
 		adress = 'Adress is not received'
 	
 	try:
-		price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
+		if s_data.find("div",{"class":"productPage__price js-contentPrice"}) == None:
+			price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price"}))
+		else:
+			price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
 	except:
 		price = float(0)
 	
@@ -58,7 +74,7 @@ def item_parser(url_):
 	except:
 		date_updated = 'Date is not received'
 
-	return name, adress, about_flat_dict, more_data_about_flat_dict, more_data_about_building_dict, price, date_updated
+	return est_type, url_, name, adress, about_flat_dict, more_data_about_flat_dict, more_data_about_building_dict, price, date_updated
 
 
 def main():
@@ -73,16 +89,16 @@ def main():
 		print (base_link)		
 		item_list_base_link = urls_for_items(base_link)		
 		print ("First page...")
-		test_item_f_cnt = 0
+		#test_item_f_cnt = 0
 		for j in range(len(item_list_base_link)):			
-			into_file_({id_:value for (id_,value) in enumerate(item_parser(item_list_base_link[j]))})
-			test_item_f_cnt +=1
-			if test_item_f_cnt == 3:
-				break
+			result.append({id_:value for (id_,value) in enumerate(item_parser(item_list_base_link[j]))})
+			#test_item_f_cnt +=1
+			#if test_item_f_cnt == 3:
+			#	break
 		print ('First page retreived')
 		page_num = 1
 		for num in range(2,51):			
-			if page_num == 3:
+			if page_num == 5:
 				break
 			page_num += 1
 			work_link = (base_link + 'page' + str(num) + '/')
@@ -90,14 +106,14 @@ def main():
 			print ('Parsing page № '+ str(page_num) + '...')
 			test_item_cnt = 0
 			for k in range(len(item_list_work_link)):
-				into_file_({id_:value for (id_,value) in enumerate(item_parser(item_list_work_link[k]))})
+				result.append({id_:value for (id_,value) in enumerate(item_parser(item_list_work_link[k]))})
 				test_item_cnt +=1
-				if test_item_cnt == 3:
+				if test_item_cnt == 5:
 					break
 			print ('Page № '+ str(page_num) + ' retreived')
 
-	#for item in result:
-	#	into_file_(item)
+	for item in result:
+		csv_in_file_(item)
 
 	print ("\n\nTest file saved succesfully.")
 
