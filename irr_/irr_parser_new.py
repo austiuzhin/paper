@@ -1,7 +1,7 @@
 import re
 import requests
 from bs4 import BeautifulSoup as bs_
-from IO_Ldr import csv_in_file_
+from IO_Ldr import csv_in_file_, into_json_
 
 links_for_parser = ['http://irr.ru/real-estate/apartments-sale/',
 					'http://irr.ru/real-estate/rooms-sale/',
@@ -10,13 +10,13 @@ links_for_parser = ['http://irr.ru/real-estate/apartments-sale/',
 
 def real_estate_type(url_):
 	if 'apartments-sale' in url_:
-		return 'Квартира для продажи'
+		return 'AS'
 	elif 'rooms-sale' in url_:
-		return 'Комната для продажи'
+		return 'RS'
 	elif 'rent' in url_:
-		return 'Квартира для аренды'
+		return 'AR'
 	elif 'rooms-rent' in url_:
-		return 'Комната для аренды'
+		return 'RR'
 	else:
 		return 'Unknown real-estate type'
 
@@ -36,17 +36,17 @@ def item_parser(url_):
 	try:
 		name = (lambda x: x.text.strip())(s_data.find("h1",{"itemprop":"name"}))
 	except:
-		name = 'Name is not received'
-	
+		name = 'Name is not received'	
 	try:
-		characteristics = list()
+		#characteristics = list()
 		char_Block_list = s_data.find_all("div",{"class":"productPage__characteristicsBlock"})[0]
-		for item in range(len(char_Block_list.contents)):
-			if char_Block_list.contents[item] != '\n':
-				characteristics.append(re.sub('\W+','',(char_Block_list.contents[item].span.text)))
+		characteristics = [re.search('[0-9.]+',(item.text.strip())).group(0) for item in char_Block_list.find_all('span',class_=re.compile('Value'))]+[re.search('[0-9]+',(char_Block_list.find('span',class_=re.compile('gray')).text)).group(0)]
+		#for item in range(len(char_Block_list.contents)):
+		#	if char_Block_list.contents[item] != '\n':
+		#		characteristics.append(re.sub('\W+','',(char_Block_list.contents[item].span.text)))
 		about_flat_dict = {id_:value for (id_,value) in enumerate(characteristics)}
 	except:
-		about_flat_dict = {"0": "Flat chracteristics not found. Probably this is not flat."}
+		about_flat_dict = {"0": "Flat chracteristics not found. Probably this is not a flat."}
 	try:
 		about_flat_tags_list = s_data.find_all("div",{"class":"productPage__infoColumnBlock"})[0]
 		about_building_tags_list = s_data.find_all("div",{"class":"productPage__infoColumnBlock"})[1]
@@ -56,10 +56,14 @@ def item_parser(url_):
 	except:
 		more_data_about_flat_dict, more_data_about_building_dict = {'0':'No more data about apartment.'},{'0':'No more information about building.'}
 	try:
+		metro_st = s_data.find("div",class_=re.compile('_metro-')).text.strip()
+	except:
+		metro_st = 'No metro station nearby'
+	try:
 		adress = (s_data.find("div",{"class":"productPage__infoTextBold js-scrollToMap"})).text.strip()
 	except:
 		adress = 'Adress is not received'
-	
+	'''
 	try:
 		if s_data.find("div",{"class":"productPage__price js-contentPrice"}) == None:
 			price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price"}))
@@ -67,14 +71,20 @@ def item_parser(url_):
 			price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
 	except:
 		price = float(0)
-	
+	'''
+	try:
+		#price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
+		price = float((re.compile(r"[+-]?\d+(?:\.\d+)?")).search(re.sub('\W+','',s_data.find("div", class_=re.compile('_price')).text)).group(0))
+	except:
+		price = float(0)
+
 	try:
 		date = (s_data.find("div",{"class":"updateProduct"})).text.strip()
 		date_updated = re.sub('\W+','', date)
 	except:
 		date_updated = 'Date is not received'
 
-	return est_type, url_, name, adress, about_flat_dict, more_data_about_flat_dict, more_data_about_building_dict, price, date_updated
+	return est_type, url_, name, adress, metro_st, about_flat_dict, more_data_about_flat_dict, more_data_about_building_dict, price, date_updated
 
 
 def main():
@@ -89,16 +99,16 @@ def main():
 		print (base_link)		
 		item_list_base_link = urls_for_items(base_link)		
 		print ("First page...")
-		#test_item_f_cnt = 0
+		test_item_f_cnt = 0
 		for j in range(len(item_list_base_link)):			
 			result.append({id_:value for (id_,value) in enumerate(item_parser(item_list_base_link[j]))})
-			#test_item_f_cnt +=1
-			#if test_item_f_cnt == 3:
-			#	break
+			test_item_f_cnt +=1
+			if test_item_f_cnt == 3:
+				break
 		print ('First page retreived')
 		page_num = 1
-		for num in range(2,51):			
-			if page_num == 5:
+		for num in range(2,52):			
+			if page_num == 2:
 				break
 			page_num += 1
 			work_link = (base_link + 'page' + str(num) + '/')
@@ -108,12 +118,13 @@ def main():
 			for k in range(len(item_list_work_link)):
 				result.append({id_:value for (id_,value) in enumerate(item_parser(item_list_work_link[k]))})
 				test_item_cnt +=1
-				if test_item_cnt == 5:
+				if test_item_cnt == 3:
 					break
 			print ('Page № '+ str(page_num) + ' retreived')
 
-	for item in result:
-		csv_in_file_(item)
+	into_json_({obj_id_:object_ for (obj_id_,object_) in enumerate(result)})
+	#for item in result:
+	#	csv_in_file_(item)
 
 	print ("\n\nTest file saved succesfully.")
 
