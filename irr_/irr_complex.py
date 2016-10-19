@@ -18,6 +18,17 @@ def apartments_sale(url_):
 	url_rooms = s_data.find(href=str(url_[:-1])+"/rooms-sale/").get('href')
 	return url_apartments, url_rooms
 
+def apartments_rent(url_):
+
+#def next_page_urls(url_):
+#	data = requests.get(url_)
+#	s_data = bs_(data.text, 'lxml')
+#	if 'page' in str(url_):
+#		return [item.get('href') for item in s_data.find_all("a",{"class":"pagination__pagesLink"}) if 'page' in item.get('href')][:-1]
+#	else:
+
+
+
 def urls_for_items(url_):
 	data = requests.get(url_)
 	s_data = bs_(data.text, 'lxml')
@@ -63,7 +74,8 @@ def item_parser(url_):
 		adress = 'Adress is not received'
 	
 	try:
-		price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
+		#price = (lambda x: float(re.search('[0-9]+',x.text.strip()).group(0)))(s_data.find("div",{"class":"productPage__price js-contentPrice"}))
+		price = float((re.compile(r"[+-]?\d+(?:\.\d+)?")).search(re.sub('\W+','',s_data.find("div", class_=re.compile('_price')).text)).group(0))
 	except:
 		price = float(0)
 	
@@ -83,9 +95,12 @@ def item_parser(url_):
 def main():
 	result = []	
 	print ("Started retrieving pages...\n\n")
-	urls_retrieved = [urls_for_items('http://irr.ru/real-estate/rent/'),
-						urls_for_items('http://irr.ru/real-estate/apartments-sale/'),
-						urls_for_items('http://irr.ru/real-estate/rooms-sale/')]
+	real_estate = move_deep('irr.ru')
+
+
+	urls_retrieved = [urls_for_items('http://irr.ru/real-estate/rent/')]#,
+						#urls_for_items('http://irr.ru/real-estate/apartments-sale/'),
+						#urls_for_items('http://irr.ru/real-estate/rooms-sale/')]
 	
 	for item in range(len(urls_retrieved)):
 		
@@ -93,7 +108,7 @@ def main():
 		for obj in range(len(urls_retrieved[item])):
 			print ("Received urls...work on url № " + str(cnt+1))
 			if cnt < 6:
-				result.append([cnt, (item_parser(urls_retrieved[item][obj]))])
+				result.append({cnt:[item_parser(urls_retrieved[item][obj])]})
 				cnt +=1
 			else:
 				break
@@ -105,5 +120,104 @@ def main():
 
 	print ("\nTest finished.")
 
+				
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+
+	for item in range(len(links_for_parser)):			
+		for page_N in range(3):
+			if 'page' not in work_link:
+				link_cnt += 1
+				print ( "Link № " + str(link_cnt))
+				work_link = links_for_parser[item]
+				next_link = page_generator(work_link)
+				page_cnt = 0
+				urls_retrieved = urls_for_items(work_link)
+				print ("First page...")
+				for obj in range(len(urls_retrieved[item])):
+					print ("Received urls...work on url № " + str(page_cnt+1))
+					print (urls_retrieved[item])
+					if page_cnt < 3:
+						#print ({page_cnt:[item_parser(urls_retrieved[obj])]})
+						#result.append({page_cnt:[item_parser(urls_retrieved[obj])]})
+						page_cnt +=1
+					else:
+						work_link = next(next_link)
+						break
+			else:
+				print ("Next page...")
+				urls_retrieved = urls_for_items(work_link)
+				for obj in range(len(urls_retrieved[item])):
+					print ("Received urls...work on url № " + str(page_cnt+1))
+					print (urls_retrieved[item])
+					if page_cnt < 3:
+						result.append({page_cnt:[item_parser(urls_retrieved[obj])]})
+						page_cnt +=1
+					else:
+						work_link = next(next_link)
+						break
+		
+
+		for item in result:
+			print (item)
+		print (sum(1 for _ in link_generator))
+	
+	print ('\nTest run finished')
+
+	#urls_retrieved = [urls_for_items('http://irr.ru/real-estate/rent/')]#,
+						#urls_for_items('http://irr.ru/real-estate/apartments-sale/'),
+						#urls_for_items('http://irr.ru/real-estate/rooms-sale/')]
+	for item in range(len(urls_retrieved)):		
+		cnt = 0
+		for obj in range(len(urls_retrieved[item])):
+			print ("Received urls...work on url № " + str(cnt+1))
+			if cnt < 6:
+				result.append({cnt:[item_parser(urls_retrieved[item][obj])]})
+				cnt +=1
+			else:
+				break
+
+	#result.append(item_parser('http://irr.ru/real-estate/apartments-sale/new/3-komn-kvartira-advert608863508.html'))
+
+	for item in result:
+		print (item)
+
+	print ("\nTest finished.")
+'''
 if __name__ == "__main__":
 	main()
