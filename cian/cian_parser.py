@@ -94,7 +94,7 @@ def parse_sale(url):
 	 		area_total = item.find_all("div", {"class": "serp-item__area-col"})
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
-	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
+	 		floor = (floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text).strip().split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		sale_list.append({
 		 		"type": "sale",
@@ -117,7 +117,7 @@ def parse_sale(url):
 	 		area_total = item.find_all("div", {"class": "serp-item__area-col"})
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
-	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
+	 		floor = (floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text).strip().split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		sale_list.append({
 				"type": "sale",
@@ -141,7 +141,7 @@ def parse_sale(url):
 
 def send_to_json(some_list):
 	for item in some_list:
-		json.dump(item, open("cian_data.json","a"))
+		json.dump(item, open("cian_data.json","a"), indent=0)
 
 
 #this function gets data from multiple pages
@@ -164,10 +164,10 @@ def merger(url_list, some_list):
 
 
 if __name__ == "__main__":
-	multi_parsing(30, "rent")
+	multi_parsing(1, "rent")
 	merger(url_list, rent_list)
 	send_to_json(rent_list)
-	multi_parsing(30, "sale")
+	multi_parsing(1, "sale")
 	merger(url_list, sale_list)
 	send_to_json(sale_list)
 	
