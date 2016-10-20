@@ -133,7 +133,7 @@ def parse_sale(url):
 
 
 def send_to_json(some_list):
-	for item in flat_list:
+	for item in some_list:
 		json.dump(item, open("cian_data.json","a"), indent=1, separators=(',', ': '))
 
 
