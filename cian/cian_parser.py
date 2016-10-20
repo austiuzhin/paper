@@ -6,8 +6,7 @@ from bs4 import BeautifulSoup
 #here we define the function that gets data - use it with every loaded page
 
 #this is list where we store date
-rent_list = []
-sale_list = []
+flat_list = []
 url_list = []
 new_list = []
 
@@ -27,6 +26,7 @@ def get_url(url):
 	 		pass
 	 del url_list[:3]
 
+
 def parse_rent(url):
 	 r = requests.get(url)
 	 soup = BeautifulSoup(r.content, "html.parser")
@@ -45,7 +45,7 @@ def parse_rent(url):
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	 		rent_list.append({
+	 		flat_list.append({
 		 		"type": "rent",
 		 		"date": parse_date,
 		 		"station": metro_station.replace("\n",""),
@@ -67,7 +67,7 @@ def parse_rent(url):
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	 		rent_list.append({
+	 		flat_list.append({
 	 			"type": "rent",
 	 			"date": parse_date,
 	 			"station": metro_station,
@@ -77,7 +77,7 @@ def parse_rent(url):
 		 		"area": area[0].replace("\t","").replace("\n","").replace(" ",""),
 		 		"floor": (floor[0] + "/" + floor[3]).replace("\t","").replace("\n","").replace(" ","")
 		 		}) 
-	 del rent_list[:3]
+	 del flat_list[:3]
 	
 def parse_sale(url):
 	 r = requests.get(url)
@@ -96,7 +96,7 @@ def parse_sale(url):
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = (floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text).strip().split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	 		sale_list.append({
+	 		flat_list.append({
 		 		"type": "sale",
 		 		"date": parse_date,
 		 		"station": metro_station.replace("\n",""),
@@ -119,7 +119,7 @@ def parse_sale(url):
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = (floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text).strip().split(" ")
 	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-	 		sale_list.append({
+	 		flat_list.append({
 				"type": "sale",
 	 			"date": parse_date,
 	 			"station": metro_station,
@@ -129,32 +129,29 @@ def parse_sale(url):
 		 		"area": area[0].replace("\t","").replace("\n","").replace(" ",""),
 		 		"floor": (floor[0] + "/" + floor[3]).replace("\t","").replace("\n","").replace(" ","")
 		 		}) 
-	 del sale_list[:3] 
-
-#this function sends data from the list to CSV file
-# def send_data_to_csv(some_list):
-# 	for item in some_list:
-# 		row_text = item.get("type") + ";" + item.get("link") + ";" + item.get("station")  + ";" + item.get("distance") + ";" + item.get("address") + ";" + item.get("price") + ";" + item.get("rooms") + ";" + item.get("area") + ";" + item.get("floor") + ";"
-# 		with open("parsing_results.csv","a", encoding = "utf-8") as row:
-# 			row.write(row_text + "\n")
+	 del flat_list[:3] 
 
 
 def send_to_json(some_list):
-	for item in some_list:
-		json.dump(item, open("cian_data.json","a"), indent=0)
+	for item in flat_list:
+		json.dump(item, open("cian_data.json","a"), indent=1, separators=(',', ': '))
 
 
 #this function gets data from multiple pages
-def multi_parsing(pages, types):
-	page = 1
-	while page <= pages:
-		url = "http://www.cian.ru/cat.php?deal_type=" + str(types) + "&engine_version=2&offer_type=flat&p=" + str(page) + "&region=1&room1=1&room2=1&room3=1&room4=1&room5=1&room6=1&room9=1&type=4"
-		if types == "rent":
-			parse_rent(url)
-		elif types == "sale":
-			parse_sale(url)
+def multi_parsing(pages):
+	page_rent = 1
+	page_sale = 1
+	while page_rent <= pages:
+		url = "http://www.cian.ru/cat.php?deal_type=rent&engine_version=2&offer_type=flat&p=" + str(page_rent) + "&region=1&room1=1&room2=1&room3=1&room4=1&room5=1&room6=1&room9=1&type=4"
+		parse_rent(url)
 		get_url(url)
-		page += 1
+		page_rent += 1
+	while page_sale <= pages:	
+		url = "http://www.cian.ru/cat.php?deal_type=sale&engine_version=2&offer_type=flat&p=" + str(page_sale) + "&region=1&room1=1&room2=1&room3=1&room4=1&room5=1&room6=1&room9=1&type=4"
+		parse_sale(url)
+		get_url(url)
+		page_sale += 1
+
 
 
 def merger(url_list, some_list):
@@ -164,12 +161,9 @@ def merger(url_list, some_list):
 
 
 if __name__ == "__main__":
-	multi_parsing(1, "rent")
-	merger(url_list, rent_list)
-	send_to_json(rent_list)
-	multi_parsing(1, "sale")
-	merger(url_list, sale_list)
-	send_to_json(sale_list)
+	multi_parsing(1)
+	merger(url_list, flat_list)
+	send_to_json(flat_list)
 	
 
 	
