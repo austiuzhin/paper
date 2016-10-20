@@ -44,7 +44,7 @@ def parse_rent(url):
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
-	 		parse_date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		rent_list.append({
 		 		"type": "rent",
 		 		"date": parse_date,
@@ -66,7 +66,7 @@ def parse_rent(url):
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
-	 		parse_date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		rent_list.append({
 	 			"type": "rent",
 	 			"date": parse_date,
@@ -94,13 +94,12 @@ def parse_sale(url):
 	 		area_total = item.find_all("div", {"class": "serp-item__area-col"})
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
-	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.strip().split(" ")
-	 		parse_date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
+	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		sale_list.append({
 		 		"type": "sale",
 		 		"date": parse_date,
 		 		"station": metro_station.replace("\n",""),
-		 		"distance": distance.replace("\t","").replace("\n"," ").strip(" "),
 		 		"address": address.replace("\t","").replace("\n",""),
 		 		"price": price[0].replace("\t","").replace("\n","").replace(" ","").replace("/",""),
 		 		"rooms": room[0].replace("\t","").replace("\n","").replace(" ",""),
@@ -118,10 +117,10 @@ def parse_sale(url):
 	 		area_total = item.find_all("div", {"class": "serp-item__area-col"})
 	 		area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 		floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
-	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.strip().split(" ")
-			parse_date = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	 		floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
+	 		parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 		sale_list.append({
-	 			"type": "sale",
+				"type": "sale",
 	 			"date": parse_date,
 	 			"station": metro_station,
 		 		"address": address.replace("\t","").replace("\n",""),
@@ -133,11 +132,11 @@ def parse_sale(url):
 	 del sale_list[:3] 
 
 #this function sends data from the list to CSV file
-def send_data_to_csv(some_list):
-	for item in some_list:
-		row_text = item.get("type") + ";" + item.get("link") + ";" + item.get("station")  + ";" + item.get("distance") + ";" + item.get("address") + ";" + item.get("price") + ";" + item.get("rooms") + ";" + item.get("area") + ";" + item.get("floor") + ";"
-		with open("parsing_results.csv","a", encoding = "utf-8") as row:
-			row.write(row_text + "\n")
+# def send_data_to_csv(some_list):
+# 	for item in some_list:
+# 		row_text = item.get("type") + ";" + item.get("link") + ";" + item.get("station")  + ";" + item.get("distance") + ";" + item.get("address") + ";" + item.get("price") + ";" + item.get("rooms") + ";" + item.get("area") + ";" + item.get("floor") + ";"
+# 		with open("parsing_results.csv","a", encoding = "utf-8") as row:
+# 			row.write(row_text + "\n")
 
 
 def send_to_json(some_list):
