@@ -3,24 +3,12 @@ import requests
 from bs4 import BeautifulSoup as bs_
 from IO_Ldr import into_json_, out_of_csv
 from datetime import datetime as dt_
+from dateparser import parse
 
-'''
-Mistakes in data_retrieval
-	Name is not received - 01
-	Flat chracteristics not found. Probably this is not a flat - 02
-	No more data about apartment - 03
-	No more information about building -04	
-	No metro station nearby - 05
-	Adress is not received - 06
-	Date is not received - 07
-	If price is equal to - 0.0 
-'''
-mtr_stations = out_of_csv('metro_.csv')
-
-links_for_parser = ['http://irr.ru/real-estate/apartments-sale/',
-					'http://irr.ru/real-estate/rooms-sale/',
-					'http://irr.ru/real-estate/rent/',
-					'http://irr.ru/real-estate/rooms-rent/']
+links_for_parser = [('http://irr.ru/real-estate/apartments-sale/', 'AS'),
+					('http://irr.ru/real-estate/rooms-sale/', 'RS'),
+					('http://irr.ru/real-estate/rent/', 'AR'),
+					('http://irr.ru/real-estate/rooms-rent/', 'RR')]
 
 def real_estate_type(url_):
 	if 'apartments-sale' in url_:
@@ -34,60 +22,158 @@ def real_estate_type(url_):
 	else:
 		return 'Unknown real-estate type'
 
-def page_generator(url_):
-	for num in range(2,52):
-		yield url_ + 'page' + str(num) + '/'
-
-def urls_for_items(url_):
-	data = requests.get(url_)
+def urls_for_items(url):
+	data = requests.get(url)
 	s_data = bs_(data.text, 'lxml')
 	return [item.get('href') for item in s_data.find_all("a",{"class":"listing__itemTitle js-productListingProductName"})]
 
-def item_parser(url_):
-	data = requests.get(url_)
-	s_data = bs_(data.text, 'lxml')	
-	est_type = real_estate_type(url_)
-	try:
-		name = (lambda x: x.text.strip())(s_data.find("h1",{"itemprop":"name"}))
-	except:
-		name = '01'	
-	try:		
-		char_Block_list = s_data.find_all("div",{"class":"productPage__characteristicsBlock"})[0]
-		characteristics = [re.search('[0-9.]+',(item.text.strip())).group(0) for item in char_Block_list.find_all('span',class_=re.compile('Value'))]+[re.search('[0-9]+',(char_Block_list.find('span',class_=re.compile('gray')).text)).group(0)]		
-		about_flat_dict = {id_:value for (id_,value) in enumerate(characteristics)}
-	except:
-		about_flat_dict = {"0": "02"}
-	try:
-		about_flat_tags_list = s_data.find_all("div",{"class":"productPage__infoColumnBlock"})[0]
-		about_building_tags_list = s_data.find_all("div",{"class":"productPage__infoColumnBlock"})[1]
-
-		more_data_about_flat_dict = {id_:value for (id_,value) in enumerate([item.text.strip() for item in (about_flat_tags_list.find_all("li",{"class":"productPage__infoColumnBlockText"}))])}
-		more_data_about_building_dict = {id_:value for (id_,value) in enumerate([item.text.strip() for item in (about_building_tags_list.find_all("li",{"class":"productPage__infoColumnBlockText"}))])}
-	except:
-		more_data_about_flat_dict, more_data_about_building_dict = {'0':'03'},{'0':'04'}
-	try:
-		mtr_string = s_data.find("div",class_=re.compile('_metro-')).text.strip()
-		metro_st = [item[0] for item in mtr_stations if item[0] in mtr_string][0]
-	except:
-		metro_st = '05'
-	try:
-		adress = (s_data.find("div",{"class":"productPage__infoTextBold js-scrollToMap"})).text.strip()
-	except:
-		adress = '06'
+def retrieving_additional_information_about_object_from_description(parsed_data,type_of_object):
+	object_characteristics_tags = parsed_data.find('span',class_=re.compile('Value'))
+	if object_characteristics_tags != None:
+		object_characteristics_tags = parsed_data.find_all('span',class_=re.compile('Value'))  
 	
-	try:		
-		price = float((re.compile(r"[+-]?\d+(?:\.\d+)?")).search(re.sub('\W+','',s_data.find("div", class_=re.compile('_price')).text)).group(0))
-	except:
-		price = float(0)
+		number_finder = re.compile('[0-9.]+')
+		if len(object_characteristics_tags) == 3:			
+			number_of_rooms = object_characteristics_tags[0].text
+			total_space = number_finder.search(object_characteristics_tags[1].text).group(0)
+			floor_number, total_number_of_floors = number_finder.findall(object_characteristics_tags[2].text)
+			return {
+			'number_of_rooms':number_of_rooms, 
+			'total_space':total_space, 
+			'floor_number':floor_number, 
+			'total_number_of_floors':total_number_of_floors,
+			}
+		elif len(object_characteristics_tags) == 4:
+			number_of_rooms = object_characteristics_tags[0].text
+			total_space = number_finder.search(object_characteristics_tags[1].text).group(0)
+			living_space = number_finder.search(object_characteristics_tags[2].text).group(0)
+			floor_number, total_number_of_floors = number_finder.findall(object_characteristics_tags[3].text)
+			return {
+			'number_of_rooms':number_of_rooms, 
+			'total_space':total_space,
+			'living_space':living_space,
+			'floor_number':floor_number, 
+			'total_number_of_floors':total_number_of_floors,
+			}		
+		elif len(object_characteristics_tags) == 2:
+			number_of_rooms = object_characteristics_tags[0].text
+			floor_number, total_number_of_floors = number_finder.findall(object_characteristics_tags[1].text)
+			return {
+			'number_of_rooms':number_of_rooms, 		
+			'floor_number':floor_number, 
+			'total_number_of_floors':total_number_of_floors,
+			}		
+		else:		
+			return {
+			'number_of_rooms':None, 
+			'total_space':None,
+			'living_space':None,
+			'floor_number':None, 
+			'total_number_of_floors':None,
+			}
+	elif object_characteristics_tags == None:
+		name_node = parsed_data.find("h1",{"itemprop":"name"})
+		number_of_rooms_received_from_description = re.match('[0-9]', name_node.text.strip()).group(0)
+		information_about_floors_received_from_description = re.findall(u'этаж\s+([0-9/\\\\.]*)',name_node.text.strip())[0]
+		if '/' in information_about_floors_received_from_description:
+			floor_number, total_number_of_floors = information_about_floors_received_from_description.split('/')
+		else:
+			floor_number, total_number_of_floors = None, None
+		
+		if type_of_object == 'RS':
+			total_space_received_from_description = re.findall('квартира\s+([0-9/\\\\.,]+)',name_node.text.strip())[0]
+			living_space_received_from_description = re.findall('продажи\s+([0-9/\\\\.,]+)',name_node.text.strip())[0]
 
-	try:
-		date = (s_data.find("div",{"class":"updateProduct"})).text.strip()
-		date_updated = re.sub('\W+','', date)
-	except:
-		date_updated = '07'
+			return {
+				'number_of_rooms':number_of_rooms_received_from_description, 
+				'total_space':total_space_received_from_description,
+				'living_space':living_space_received_from_description,
+				'floor_number':floor_number, 
+				'total_number_of_floors':total_number_of_floors,
+			}
 
-	return est_type, url_, name, adress, metro_st, about_flat_dict, more_data_about_flat_dict, more_data_about_building_dict, price, date_updated
+		elif type_of_object == 'RR' or type_of_object == 'AR':
+			total_space_received_from_description = re.findall('([0-9.]+)+\s+кв',name_node.text.strip())[0]
+			living_space_received_from_description = re.findall('([0-9.]+)+\s+кв',name_node.text.strip())[0]
+		
+			return {
+				'number_of_rooms':number_of_rooms_received_from_description, 
+				'total_space':total_space_received_from_description,
+				'living_space':living_space_received_from_description,
+				'floor_number':floor_number, 
+				'total_number_of_floors':total_number_of_floors,
+			}
+	
+	else:		
+		return {
+		'number_of_rooms':None, 
+		'total_space':None,
+		'living_space':None,
+		'floor_number':None, 
+		'total_number_of_floors':None,
+		}		
+	
+def date_retrieved_from_object_info(parsed_data):
+	date_string = parsed_data.find("div",{"class":"updateProduct"})
+	raw_date = re.sub('\W+','', date_string.text) if date_string else None
+	if ('Размещено' in raw_date) and (raw_date != None):
+		updated_date, created_date = raw_date.split('Размещено')
+	elif ('Размещено' in raw_date) and ('сегод' in raw_date) and (raw_date != None):
+		updated_date, created_date = raw_date.split('Размещено')
+	elif ('Размещено' not in raw_date) and (raw_date != None):
+		updated_date = raw_date
+		created_date = None
+	elif ('Размещено' not in raw_date) and ('сегод' in raw_date) and (raw_date != None):
+	 	return (datetime.datetime.now()).strftime("%d-%m-%Y")
+	else:
+		updated_date = None
+		created_date = None
 
+	updated_date = parse(updated_date) if updated_date else None
+	created_date = parse(created_date) if created_date else None
+
+	return created_date if created_date else updated_date
+
+
+def item_parser(url):
+	data = requests.get(url)
+	s_data = bs_(data.text, 'lxml')	
+	est_type = real_estate_type(url)
+	metro_stations = out_of_csv('metro_.csv')
+	name_node = s_data.find("h1",{"itemprop":"name"})
+	additional_information_about_object_in_item = retrieving_additional_information_about_object_from_description(s_data,est_type)
+		
+	metro_description = s_data.find("div",class_=re.compile('_metro-'))
+	if metro_description:
+		for item in metro_stations:
+			if item[0] in metro_description.text.strip():
+				metro_station_near_object = item[0]
+	else:
+		metro_station_near_object = None	
+	
+	adress_description = s_data.find("div",{"class":"productPage__infoTextBold js-scrollToMap"})
+	
+	num_searcher = re.compile(r"[+-]?\d+(?:\.\d+)?")
+	price_from_description = s_data.find("div", class_=re.compile('_price'))
+	list_of_numbers_from_string = num_searcher.findall(price_from_description.text.strip()) if price_from_description else None
+	price = float(''.join(list_of_numbers_from_string))	if list_of_numbers_from_string else None
+	
+	date = date_retrieved_from_object_info(s_data)
+
+	return {
+			'type':est_type,
+			'obj_adress':adress_description.text.strip() if adress_description else None,
+			'metro_station':metro_station_near_object,
+			'name': name_node.text.strip() if name_node else None,
+			'area': additional_information_about_object_in_item.get('total_space'),
+			'rooms': additional_information_about_object_in_item.get('number_of_rooms'),
+			'floor': additional_information_about_object_in_item.get('floor_number'),			
+			'price':price,
+			'href':url,
+			'source':'irr',
+			'date':date,
+			}
+	
 
 def main():
 	result = []	
