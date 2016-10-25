@@ -1,8 +1,11 @@
 import re
 import json
+import datetime
 from IO_Ldr import into_json_, out_of_file
 
-data = out_of_file('/irr_/items_.json')
+''' 
+#This is an old version. I had tried to do all __in_one_line__, 
+#but data which had been in files was difficult to __tighten__.
 
 def needed_irr_simple(dict_):
 	needed = []
@@ -22,6 +25,7 @@ def needed_irr_simple(dict_):
 			continue
 
 	return needed
+'''
 
 def merging_text_names(dict_):
 	for item in range(len(dict_)-1):#Объединяет текст в наименованиях
@@ -29,7 +33,8 @@ def merging_text_names(dict_):
 			dict_[str(item)]['2'] = ('').join(dict_[str(item)]['2'])
 
 def needed_irr_complex(dict_):
-	for item in range(len(data)-1):
+	ready_data = []
+	for item in range(len(dict_)-1):
 		classif = dict_[str(item)].get('0')
 		try:
 			adress = dict_[str(item)]['3']
@@ -56,22 +61,21 @@ def needed_irr_complex(dict_):
 		try:
 			rooms = dict_[str(item)]['5']['0']
 		except:			
-			rooms = re.search('[^0-9]',dict_[str(item)]['2']).group(0)
+			rooms = re.search('^[0-9]',dict_[str(item)]['2']).group(0)
 		
-#		floor_info = dict_[str(item)]['5']['3']+' этаж из  '+(dict_[str(item)]['5']['4']
-#
-#		price = 
-#		href_ = 
-#		date_from site = 
+		floor_info = floor_search(dict_[str(item)])
+
+		price = dict_[str(item)].get('8')
 		
-			#sq_meters = re.compile(u'\s+[0-9]+\s+')
-	#sq_meters.search(t_list[100]).group(0).strip()
-	#for item in range(len(data)):
-	#	classif = data[item].get('0')
-	#	adress = data[item].get('3')
-	#	metro_st = data[item].get('3')
-	#	name = 
-	#	total_sq = 
+		href_ = dict_[str(item)].get('1')
+
+		try:
+			date_from site = date_from_site(dict_[str(item)]['9'])
+		except:
+			date_from site = 0
+
+	return 
+
 
 def RS_or_RR_living_square(string_):
 	square_lst = []
@@ -89,3 +93,55 @@ def RS_or_RR_living_square(string_):
 			return float(square_lst[0]), float(square_lst[1])
 	except:
 		return 0
+
+def date_from_site(string_):
+	year = int((datetime.datetime.now()).strftime("%Y"))
+	dates = {u'янв':'1',u'февр':'2',u'мар':'3',u'апр':'4',u'ма':'5',u'июн':'6',u'июл':'7',u'авг':'8',u'сент':'9',u'октяб':'10',u'нояб':'11',u'дека':'12'}
+	if u'сегод' in string_:
+		return (datetime.datetime.now()).strftime("%d-%m-%Y")
+	else:
+		months = re.findall(r'янв|февр|мар|апр|ма|июн|июл|авг|сент|октяб|нояб|дека', string_)
+		for item in range(len(months)):
+			months[item] = dates.get(months[item])
+		days = re.findall('[+-]?\d+(?:\.\d+)?', string_)
+		if len(days) == 2:
+			refresh_date = (datetime.date(year,int(months[0]),int(days[0]))).strftime('%d-%m-%Y')
+			creation_date = (datetime.date(year,int(months[1]),int(days[1]))).strftime('%d-%m-%Y')
+			return refresh_date,creation_date
+		else:
+			return (datetime.date(year,int(months[0]),int(days[0]))).strftime('%d-%m-%Y')
+
+def floor_search(dict_):
+	if (len(dict_['5']) == 1):
+		try:
+			return re.search(u'этаж\s+[0-9]?',dict_['2']).group(0)
+		except:
+			return 0
+	elif (len(dict_['5']) == 4) or (len(dict_['5']) == 3):
+		items = range(len(dict_['5']))
+		return dict_['5'][str(items[-2])] + ' этаж из ' + dict_['5'][str(items[-1])]
+	elif len(dict_['5']) == 5:
+		return dict_['5']['3'] +' этаж из '+ dict_['5']['4']
+	else:
+		return 0
+			
+
+
+def main():
+	data = merging_text_names(out_of_file('/irr_/items_.json'))	
+	ready_data = needed_irr_complex(data)
+	into_json_(ready_data, filename_ = 'ready_data.json')
+
+
+if __name__ == "__main__":
+	# main()
+	raw_date = '20сентябряРазмещено6сентября'
+	if 'Размещено' in raw_date:
+		updated_date, created_date = raw_date.split('Размещено')
+	else:
+		updated_date = raw_date
+		created_date = None
+
+	updated_date = parse(updated_date)
+	created_date = parse(created_date) if created_date else None
+	
