@@ -132,11 +132,11 @@ def multi_parsing(pages):
 
 if __name__ == "__main__":
 	flat_list = []
-	# multi_parsing(40)
-	parse_rent("http://www.cian.ru/cat.php?deal_type=rent&engine_version=2&metro%5B0%5D=244&offer_type=flat&p=3&room1=1&room2=1&room3=1&room4=1&room5=1&room6=1&room9=1&type=4")
+	multi_parsing(30)
 	print(flat_list)
 	send_to_json(flat_list)
 	
 
 	
+
 
