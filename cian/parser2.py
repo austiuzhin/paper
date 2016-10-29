@@ -108,7 +108,7 @@ def parse_sale(url):
 
 
 def send_to_json(some_list):
-	with codecs.open('cian_items.json','a','cp1251') as f_out:
+	with codecs.open('cian_data.json','a','cp1251') as f_out:
 			f_out.write(json.dumps(some_list, indent = 4))
 
 #this function gets data from multiple pages
@@ -138,5 +138,4 @@ if __name__ == "__main__":
 	
 
 	
-
 
