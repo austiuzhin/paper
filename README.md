@@ -1,2 +1,5 @@
-# paper
-python assisted property retrieval
+# PAPER
+
+### python assisted property retrieval
+
+This is simple site project with some Machine Learning features in it.
