@@ -25,10 +25,13 @@ class Flat(Base):
 	href = Column(String(50))
 	source = Column(String(10))
 	name = Column(String(100))
+	object_latitude = Column(String(20))
+	object_longitude = Column(String(20))
 	prices = relationship("Price")
+	
 
-
-	def __init__(self, item_type=None, date=None, metro_station=None, object_address=None, rooms=None, area=None, floor=None, href=None, source=None, name=None):
+	def __init__(self, item_type=None, date=None, metro_station=None, object_address=None, rooms=None, area=None, floor=None,\
+		href=None, source=None, name=None, object_latitude=None, object_longitude=None):
 		self.item_type = item_type
 		self.date = date
 		self.metro_station = metro_station
@@ -39,6 +42,8 @@ class Flat(Base):
 		self.href = href
 		self.source = source
 		self.name = name
+		self.object_latitude = object_latitude
+		self.object_longitude = object_longitude
 
 	def __repr__(self):
 		return '<Item {} {}>'.format(self.name, self.href)

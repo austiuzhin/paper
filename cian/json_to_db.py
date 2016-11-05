@@ -2,6 +2,7 @@ from create_db import db_session, Flat, Price
 import json
 import codecs
 from datetime import datetime
+from geopy.geocoders import Yandex
 
 
 def out_of_file(filename):
@@ -10,6 +11,7 @@ def out_of_file(filename):
 
 
 def write_to_db_one(data_list):
+	geolocator = Yandex()
 	for item in data_list:
 		try:
 			db_session.query(Flat.href).filter(Flat.href==item["href"]).first()[0]
@@ -18,13 +20,19 @@ def write_to_db_one(data_list):
 			date = item["date"]
 			metro_station = item["metro_station"]
 			object_address = item["obj_address"]
+			print(type(object_address))
+			print(object_address)
 			rooms = item["rooms"]
 			area = item["area"]
 			floor = item["floor"]
 			href = item["href"]
 			source = item["source"]
 			name = item["name"]
-			db_item = Flat(item_type, date, metro_station, object_address, rooms, area, floor, href, source, name)
+			location = geolocator.geocode(object_address)
+			print(type(location))
+			object_latitude = location.latitude
+			object_longitude = location.longitude
+			db_item = Flat(item_type, date, metro_station, object_address, rooms, area, floor, href, source, name, object_latitude, object_longitude)
 			db_session.add(db_item)
 			db_session.commit()
 
