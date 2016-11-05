@@ -19,7 +19,6 @@ class Flat(Base):
 	item_type = Column(String(2))
 	metro_station = Column(String(50))
 	object_address = Column(String(100))
-	price = Column(Integer)
 	rooms = Column(Integer)
 	area = Column(Integer)
 	floor = Column(String(20))
@@ -29,12 +28,11 @@ class Flat(Base):
 	prices = relationship("Price")
 
 
-	def __init__(self, item_type=None, date=None, metro_station=None, object_address=None, price=None, rooms=None, area=None, floor=None, href=None, source=None, name=None):
+	def __init__(self, item_type=None, date=None, metro_station=None, object_address=None, rooms=None, area=None, floor=None, href=None, source=None, name=None):
 		self.item_type = item_type
 		self.date = date
 		self.metro_station = metro_station
 		self.object_address = object_address
-		self.price = price
 		self.rooms = rooms
 		self.area = area
 		self.floor = floor
@@ -48,12 +46,13 @@ class Flat(Base):
 
 class Price(Base):
 	__tablename__ = 'price'
+	id = Column(Integer, primary_key=True)
 	flat_id = Column(Integer, ForeignKey('flat.id'))
 	price = Column(Integer)
 	date = Column(DateTime)
 	
 	def __init__(self, flat_id=None, price=None, date=None):
-		self.id = flat_id
+		self.flat_id = flat_id
 		self.price = price
 		self.date = date
 
