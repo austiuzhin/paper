@@ -27,9 +27,10 @@ class Item(Base):
     metro_station = Column(String(150))
     rooms = Column(Integer)
     area = Column(Float)
-    href = Column(String(500))#, unique = True)
+    href = Column(String(250), unique = True)
     source = Column(String(50))
     floor = Column(Integer)
+    #date_and_price_reference = relationship("Date_and_price", back_populates="parent_item")
     relashion_btw_date_price_object = relationship('Date_and_price', backref ='rel_date_price')
 
     def __init__ (self, obj_type = None, name = None, obj_adress = None, metro_station = None, rooms = None, area = None, href = None, source = None, floor = None):
@@ -53,6 +54,7 @@ class Date_and_price(Base):
     date_of_creation = Column(DateTime)
     date_of_parsing = Column(DateTime)
     object_id = Column(Integer, ForeignKey('estate_items.id'))
+    #parent_item = relationship("Item", back_populates="date_and_price_reference", uselist=False)
 
     def __init__(self, price = None, date_of_creation = None, date_of_parsing = None,  object_id = None):
         self.price = price
