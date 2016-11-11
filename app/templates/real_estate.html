@@ -22,19 +22,19 @@
 				<th>Цена</th>
 				<th>Ссылка</th>
 				<th>Источник</th>
-				{% for item in range(data|length) %}
+				{%for instance in range(0, number_of_items)%}
 				<tbody>
 					<tr>
-						<td>{{item+1}}</td>
-						<td>{{data[item]['name']}}</td>
-						<td>{{data[item]['obj_adress']}}</td>
-						<td>{{data[item]['rooms']}}</td>
-						<td>{{data[item]['area']}}</td>
-						<td>{{data[item]['floor']}}</td>
-						<td>{{data[item]['metro_station']}}</td>
-						<td>{{data[item]['price']}}</td>
-						<td><a href="{{data[item]['href']}}" target="_blank">Ссылка</a></td>
-						<td>{{data[item]['source']}}</td>
+						<td>{{data[instance].id}}</td>
+						<td>{{data[instance].name}}</td>
+						<td>{{data[instance].obj_adress}}</td>
+						<td>{{data[instance].rooms}}</td>
+						<td>{{data[instance].area}}</td>
+						<td>{{data[instance].floor}}</td>
+						<td>{{data[instance].metro_station}}</td>
+						<td>{{date_and_price[instance].price}}</td>
+						<td><a href="{{data[instance].href}}" target="_blank">Ссылка</a></td>
+						<td>{{data[instance].source}}</td>
 					</tr>
 				</tbody>
 				{%endfor%}

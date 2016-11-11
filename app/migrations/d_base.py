@@ -45,7 +45,8 @@ class Item(Base):
         self.floor = floor
 
     def __repr__(self):
-        return '<Object  {} {} {} {}'.format(self.obj_type, self.obj_adress, self.href, self.source)
+        return '{} {} {} {} {} {} {} {} {}'.format(self.obj_type, self.name, self.obj_adress, self.metro_station, self.rooms, self.area, self.href, self.source, self.floor)
+        #return '<Object  {} {} {} {}'.format(self.obj_type, self.obj_adress, self.href, self.source)
 
 class Date_and_price(Base):
     __tablename__ = 'date_and_price'
@@ -63,7 +64,8 @@ class Date_and_price(Base):
         self.object_id = object_id
 
     def __repr__(self):
-        return '<Price {}, creation date {}, parsing date {}>'.format(self.price,self.date_of_creation, self.date_of_parsing)
+        return '{} {}'.format(self.price,self.date_of_creation)
+        #return '<Price {}, creation date {}, parsing date {}>'.format(self.price,self.date_of_creation, self.date_of_parsing)
 
 if __name__ == '__main__':
     Base.metadata.create_all(bind = engine)
