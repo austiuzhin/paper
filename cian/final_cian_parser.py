@@ -42,7 +42,7 @@ def parse_rent(url):
 	 		floors = floor[0] + " этаж из " + floor[3]
 	 	except IndexError:
 	 		floors = floor[0] + " этаж из " + floor[0]
-	 	parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+	 	parse_date = datetime.now().strftime("%d-%m-%Y")
 	 	link = item.find("a",{"class":"serp-item__card-link link"}).get('href')
 	 	if room == "Студия":
 	 		name = "Студия, {}".format(metro_station)
