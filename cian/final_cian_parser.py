@@ -38,10 +38,7 @@ def parse_rent(url):
 	 	area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 	floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 	floor = floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
-	 	try:
-	 		floors = floor[0] + " этаж из " + floor[3]
-	 	except IndexError:
-	 		floors = floor[0] + " этаж из " + floor[0]
+	 	floors = floor[0]
 	 	parse_date = datetime.now().strftime("%d-%m-%Y")
 	 	link = item.find("a",{"class":"serp-item__card-link link"}).get('href')
 	 	if room == "Студия":
@@ -85,10 +82,7 @@ def parse_sale(url):
 	 	area = area_total[0].find_all("div", {"class": "serp-item__solid"})[0].text.split(" ")
 	 	floor_line = item.find_all("div", {"class": "serp-item__floor-col"})
 	 	floor = (floor_line[0].find_all("div", {"class": "serp-item__solid"})[0].text).strip().split(" ")
-	 	try:
-	 		floors = floor[0] + " этаж из " + floor[3]
-	 	except IndexError:
-	 		floors = floor[0] + " этаж из " + floor[0]
+	 	floors = floor[0]
 	 	parse_date = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
 	 	link = item.find("a",{"class":"serp-item__card-link link"}).get('href')
 	 	if room == "Студия":

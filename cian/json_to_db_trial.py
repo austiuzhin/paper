@@ -52,7 +52,7 @@ def write_to_db_two(data_list):
 		date = datetime.strptime(item["date"],"%d-%m-%Y %H:%M:%S")
 		flat_id = item_check[1]
 		db_item = Price(flat_id, price, date)
-		db_session.execute("DELETE FROM price WHERE rowid NOT IN (SELECT min(rowid) FROM price GROUP BY price, date, flat)")
+		# db_session.execute("DELETE FROM price WHERE rowid NOT IN (SELECT min(rowid) FROM price GROUP BY price, date, flat_id)")
 		db_session.add(db_item)
 		db_session.commit()
 
