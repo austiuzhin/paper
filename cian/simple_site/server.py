@@ -17,6 +17,12 @@ def real_estate():
 	data = out_of_file('cian_items.json')
 	return render_template('real_estate.html', data = data)
 
+
+@app.route("/search_form")
+def search_form():
+	return render_template('search_form.html')
+
+
 @app.route('/about_us')
 def about_us():
 	return render_template('about_us.html')

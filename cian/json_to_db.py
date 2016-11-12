@@ -20,8 +20,6 @@ def write_to_db_one(data_list):
 			date = item["date"]
 			metro_station = item["metro_station"]
 			object_address = item["obj_address"]
-			print(type(object_address))
-			print(object_address)
 			rooms = item["rooms"]
 			area = item["area"]
 			floor = item["floor"]
@@ -29,7 +27,6 @@ def write_to_db_one(data_list):
 			source = item["source"]
 			name = item["name"]
 			location = geolocator.geocode(object_address)
-			print(type(location))
 			object_latitude = location.latitude
 			object_longitude = location.longitude
 			db_item = Flat(item_type, date, metro_station, object_address, rooms, area, floor, href, source, name, object_latitude, object_longitude)
