@@ -1,7 +1,7 @@
 import re
 import requests
 from bs4 import BeautifulSoup as bs_
-from IO_Ldr import into_json_, out_of_csv, out_of_file
+from IO_Ldr import into_json_, out_of_csv, out_of_file, read_proxie_list
 from datetime import datetime as dt_
 from dateparser import parse
 
@@ -187,12 +187,15 @@ def item_parser(url,estate_type,proxie):
 
     return {
             'type':estate_type,
-            'obj_adress':adress_description.text.strip() if adress_description else None,
+            'obj_address':adress_description.text.strip() if adress_description else None,
             'metro_station':metro_station_near_object,
             'name': name_node.text.strip() if name_node else None,
-            'area': additional_information_about_object_in_item.get('total_space') if additional_information_about_object_in_item else None,
-            'rooms': additional_information_about_object_in_item.get('number_of_rooms') if additional_information_about_object_in_item else None,
-            'floor': additional_information_about_object_in_item.get('floor_number') if additional_information_about_object_in_item else None,          
+            'area': additional_information_about_object_in_item.get('total_space') if 
+                        additional_information_about_object_in_item else None,
+            'rooms': additional_information_about_object_in_item.get('number_of_rooms') if 
+                        additional_information_about_object_in_item else None,
+            'floor': additional_information_about_object_in_item.get('floor_number') if 
+                        additional_information_about_object_in_item else None,          
             'price':price,
             'href':url,
             'source':'irr',
@@ -206,7 +209,7 @@ def main():
                     ('http://irr.ru/real-estate/rooms-sale/', 'RS'),
                     ('http://irr.ru/real-estate/rent/', 'AR'),
                     ('http://irr.ru/real-estate/rooms-rent/', 'RR')]
-    prx = out_of_file('proxies.json')
+    prx = read_proxie_list('proxies.txt')
     result = [] 
     print ("Started retrieving pages...\n\n")
     link_cnt = 0

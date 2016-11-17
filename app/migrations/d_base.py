@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, Float, String, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, Text, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import scoped_session, sessionmaker,relationship
 from sqlalchemy.ext.declarative import declarative_base
 import logging
@@ -23,31 +23,39 @@ class Item(Base):
     id = Column(Integer, primary_key = True, autoincrement = True)  
     obj_type = Column(String(5))
     name = Column(Text)
-    obj_adress = Column(String(250))
+    obj_address = Column(String(250))
     metro_station = Column(String(150))
     rooms = Column(Integer)
     area = Column(Float)
     href = Column(String(250), unique = True)
     source = Column(String(50))
     floor = Column(Integer)
-    #date_and_price_reference = relationship("Date_and_price", back_populates="parent_item")
+    lat = Column(Float)
+    lng = Column(Float)
+    is_valid = Column(Boolean)
+    
     relashion_btw_date_price_object = relationship('Date_and_price', backref ='rel_date_price')
 
-    def __init__ (self, obj_type = None, name = None, obj_adress = None, metro_station = None, rooms = None, area = None, href = None, source = None, floor = None):
+    def __init__ (self, obj_type = None, name = None, obj_address = None, metro_station = None, 
+        rooms = None, area = None, href = None, source = None, floor = None, lat = None, lng = None, is_valid = True):
+        
         self.obj_type = obj_type
         self.name = name
-        self.obj_adress = obj_adress
+        self.obj_address = obj_address
         self.metro_station = metro_station
         self.rooms = rooms
         self.area = area
         self.href = href
         self.source = source
         self.floor = floor
+        self.lat = lat
+        self.lng = lng
+        self.is_valid = is_valid
 
     def __repr__(self):
-        return '{} {} {} {} {} {} {} {} {}'.format(self.obj_type, self.name, self.obj_adress, self.metro_station, self.rooms, self.area, self.href, self.source, self.floor)
-        #return '<Object  {} {} {} {}'.format(self.obj_type, self.obj_adress, self.href, self.source)
-
+        return '{} {} {} {} {} {} {} {} {} {} {}'.format(self.obj_type, self.name, self.obj_address, self.metro_station, 
+            self.rooms, self.area, self.href, self.source, self.floor, self.lat, self.lng, self.is_valid)
+        
 class Date_and_price(Base):
     __tablename__ = 'date_and_price'
     id = Column(Integer, primary_key = True, autoincrement = True)  
@@ -55,7 +63,7 @@ class Date_and_price(Base):
     date_of_creation = Column(DateTime)
     date_of_parsing = Column(DateTime)
     object_id = Column(Integer, ForeignKey('estate_items.id'))
-    #parent_item = relationship("Item", back_populates="date_and_price_reference", uselist=False)
+    
 
     def __init__(self, price = None, date_of_creation = None, date_of_parsing = None,  object_id = None):
         self.price = price
@@ -65,7 +73,7 @@ class Date_and_price(Base):
 
     def __repr__(self):
         return '{} {}'.format(self.price,self.date_of_creation)
-        #return '<Price {}, creation date {}, parsing date {}>'.format(self.price,self.date_of_creation, self.date_of_parsing)
+        
 
 if __name__ == '__main__':
     Base.metadata.create_all(bind = engine)

@@ -6,6 +6,18 @@ import csv
 #from sys import stdin
 import re
 
+def read_proxie_list(filename):
+    if isfile(filename):
+        with open(filename,'r',encoding = 'utf-8') as f:
+            proxie_string =  f.read()
+        proxie_list = (proxie_string).split('\n')
+        proxies = dict()
+        for item in range(len(proxie_list)):
+            proxies.update({'http{}'.format(item):'{}'.format(proxie_list[item])})  
+        return proxies
+    else:
+        return 'File not found'
+
 def into_file_(dict_ = dict()):
     try:
         type(dict_) == dict
