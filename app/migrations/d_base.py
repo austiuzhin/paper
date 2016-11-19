@@ -12,10 +12,10 @@ Base = declarative_base()
 
 Base.query = db_session.query_property()
 
-#Creating a logger and a log file for debugging
-handler = logging.FileHandler('sqlalchemy.engine.log')
-handler.level = logging.DEBUG
-logging.getLogger('sqlalchemy.engine').addHandler(handler)
+# #Creating a logger and a log file for debugging
+# handler = logging.FileHandler('sqlalchemy.engine.log')
+# handler.level = logging.DEBUG
+# logging.getLogger('sqlalchemy.engine').addHandler(handler)
 
 
 class Item(Base):
