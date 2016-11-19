@@ -6,3 +6,5 @@
 *.json
 app/env/
 app/venv/
+*.sqlite
+*.db
