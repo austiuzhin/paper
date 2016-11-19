@@ -4,3 +4,5 @@
 *.txt
 *.png
 *.json
+app/env/
+app/venv/
