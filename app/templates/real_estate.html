@@ -1,0 +1,49 @@
+{%extends "base.html"%}
+
+{%block title%}Список объектов недвижимости{%endblock%}
+
+
+{%block page_content%}
+<div class="container">
+	<h1>Квартиры и комнаты</h1>
+	<p style="font-family: verdana; font-size: 15" align="right">По состоянию на {{date_of_retrieval}}</p>
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>П\п</th>
+				<th>Наименование</th>
+				<th>Адрес</th>
+				<th>Количество комнат</th>
+				<th>Общая площадь</th>
+				<th>Этаж</th>
+				<th>Станция метро</th>
+				<th>Цена</th>
+				<th>Ссылка</th>
+				<th>Источник</th>
+				{%for instance in range(0, number_of_items)%}
+				<tbody>
+					<tr>
+						<td>{{data[instance].id}}</td>
+						<td>{{data[instance].name}}</td>
+						<td>{{data[instance].obj_adress}}</td>
+						<td>{{data[instance].rooms}}</td>
+						<td>{{data[instance].area}}</td>
+						<td>{{data[instance].floor}}</td>
+						<td>{{data[instance].metro_station}}</td>
+						<td>{{date_and_price[instance].price}}</td>
+						<td><a href="{{data[instance].href}}" target="_blank">Ссылка</a></td>
+						<td>{{data[instance].source}}</td>
+					</tr>
+				</tbody>
+				{%endfor%}
+			</tr>
+		</thead>
+	</table>
+	<div class="pagination">
+	</div>
+</div>
+</div>
+
+
+{%endblock%}
