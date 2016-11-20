@@ -1,0 +1,43 @@
+{%extends "base.html"%}
+
+
+{%block title%}Результаты поиска{%endblock%}
+
+
+{%block page_content%}
+<div class="container">
+	<h1>Результаты поиска</h1>
+<div class="table-responsive">
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Наименование</th>
+				<th>Адрес</th>
+				<th>Количество комнат</th>
+				<th>Общая площадь</th>
+				<th>Этаж</th>
+				<th>Станция метро</th>
+				<th>Цена</th>
+				<th>Ссылка</th>
+				{% for item in range(data|length) %}
+				<tbody>
+					<tr>
+						<td>{{data[item]['name']}}</td>
+						<td>{{data[item]['obj_address']}}</td>
+						<td>{{data[item]['rooms']}}</td>
+						<td>{{data[item]['area']}}</td>
+						<td>{{data[item]['floor']}}</td>
+						<td>{{data[item]['metro_station']}}</td>
+						<td>{{data[item]['price']}}</td>
+						<td><a href="{{data[item]['href']}}" target="_blank">Ссылка</a></td>
+					</tr>
+				</tbody>
+				{%endfor%}
+			</tr>
+		</thead>
+	</table>
+</div>
+</div>
+
+
+{%endblock%}

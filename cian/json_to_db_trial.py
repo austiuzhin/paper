@@ -32,7 +32,7 @@ def write_to_db_one(data_list,start_number):
 					location = geolocator.geocode(object_address)
 					object_latitude = location.latitude
 					object_longitude = location.longitude
-				except (GeocoderTimedOut):
+				except:
 					geolocator = GoogleV3()
 					location = geolocator.geocode(object_address)
 					object_latitude = location.latitude
@@ -59,8 +59,8 @@ def write_to_db_two(data_list):
 #сначала попробуй прогнать все позиции - если заблокируют, то попробуй работать порциями
 
 if __name__ == "__main__":
-	data_list = out_of_file("cian_items.json") 
-	# data_list = out_of_file("cian_data.json")
+	# data_list = out_of_file("cian_items.json") 
+	data_list = out_of_file("cian_data.json")
 	write_to_db_one(data_list,1)
 	# write_to_db_one(data_list,25001)
 	# write_to_db_one(data_list,50001)

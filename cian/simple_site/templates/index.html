@@ -1,7 +1,17 @@
 {%extends "base.html"%}
 
+{%block head%}
+{{ super() }}
 
-{%block title%}Начальная страница{%endblock%}
+<style type="text/css">
+	/*html, body { height: 100%; margin: 0; padding: 0; }*/
+	#map { height: 400px; width:600px; }
+</style>
+
+
+{%endblock%}
+
+{%block title%}Поиск недвижимости{%endblock%}
 
 
 {%block page_content%}
@@ -9,31 +19,83 @@
 
 
 <div class="row">
-  <div class="col-lg-12">
-    <div class="input-group input-group-lg">
-    	
-    	<input type="text" class="form-control" placeholder="Введите улицу и дом">
-    	
-		<div class="input-group-btn">
-        	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Количество комнат<span class="caret"></span></button>
-        	<ul class="dropdown-menu">
-		         <li><input type="checkbox" />Студия</li>
-		         <li><input type="checkbox" />1-комнатная</li>
-		         <li><input type="checkbox" />2-комнатная</li>
-		         <li><input type="checkbox" />3-комнатная</li>
-		         <li><input type="checkbox" />4-комнатная</li>
-		         <li><input type="checkbox" />5-комнатная</li>
-		         <li><input type="checkbox" />Многокомнатная</li>
-		         <li><input type="checkbox" />Искать все</li>
-	        </ul>
-      	</div><!-- /btn-group -->
+	<div class="col-lg-8">
+		<div style="text-align: center;">
+			<div id="map"></div>
+		</div>
+		<script type="text/javascript">
 
-    	<span class="input-group-btn">
-        	<button class="btn btn-default" type="button">Поиск</button>
-      </span>
-    </div><!-- /input-group -->
-  </div><!-- /.col-lg-6 -->
-</div><!-- /.row -->
+			
+
+			function initMap() {
+				var myLatLng = {lat: 55.753559, lng: 37.609218};
+
+				var map = new google.maps.Map(document.getElementById('map'), {
+				    zoom: 10,
+				    center: myLatLng
+				  });
+
+
+				var marker = new google.maps.Marker({
+				    position: myLatLng,
+				    map: map,
+				});
+				marker.setMap(map);
+			}
+
+
+
+
+		</script>
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB_H-fIl9h83Ag5qlG5i0Wn10ivh0KNDAE&callback=initMap">
+		</script>
+	 
+	</div>
+	<div class="col-lg-4" style="background-color: #f2f2f2;">
+		<h2>Параметры поиска</h2>
+		<form method="POST" action="/results/">
+			<h4 style="margin-top: 20px;">Тип недвижимости</h4>
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="AR" autocomplete="off">Аренда
+				</label>
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="AS" autocomplete="off">Покупка
+				</label>
+			</div>
+			<h4>Количество комнат</h4>
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="Студия" autocomplete="off">Студия
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="1" autocomplete="off">1
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="2" autocomplete="off">2
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="3" autocomplete="off">3
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="4" autocomplete="off">4
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="Многокомнатная" autocomplete="off">5+
+				</label>
+			</div>
+			<h4>Адрес</h4>
+			<div class="input-group" style="margin-bottom: 20px;">
+				<input name="input_address" type="text" class="form-control" placeholder="Введите улицу и дом" aria-describedby="basic-addon1">
+			</div>
+			<div class="btn-group btn-group-lg" role="group" aria-label="..." style="margin-bottom: 20px;">
+				<button type="submit" class="btn btn-block" href="/results/">Начать поиск</button>
+			</div>
+		</form>
+
+	</div><!-- /.col-lg-4 -->
+</div>
 {%endblock%}
 
 
