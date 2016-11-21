@@ -1,46 +1,96 @@
 {%extends "base.html"%}
 
-{%block page_content%}
-	<div class="bd-pageheader">	
-		<div class = "container">
-			<h1></h1>
-		</div>
-	</div>
-	<div class="container">
-  		<div class="jumbotron">
-  			<h1> <b style="color:red;">PAPER</b> Недвижимость</h1>
-  			<p style = "font-size=18 px;">Этот проект призван облегчить поиск квартиры или комнаты рядом с удобным для вас местом.<br> И наш алгоритм постарается найти для вас наиболее удобное место расположения квартиры или комнаты для аренды или покупки.</p>
-  			<p>Вам не хочется рано вставать по утрам и далеко ходить? Вам надоело метро и вечные пробки? <br>
-  			Тогда наш сайт для Вас!</p>
-  		</div>
-	</div>
+{%block head%}
+{{ super() }}
+
+<style type="text/css">
+	/*html, body { height: 100%; margin: 0; padding: 0; }*/
+	#map { height: 400px; width:600px; }
+</style>
+
+
 {%endblock%}
 
+{%block title%}Поиск недвижимости{%endblock%}
 
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-	<title>Основная страница проекта</title>
-</head>
-<body>
-	<div class="bd-pageheader">	
-		<div class = "container">
-			<h1>Титульная страница</h1>
-			<p class="lead">Просто титульная страница с кнопкой</p>
+
+{%block page_content%}
+
+
+
+<div class="row">
+	<div class="col-lg-8">
+		<div style="text-align: center;">
+			<div id="map"></div>
 		</div>
+		<script type="text/javascript">
+			
+			function initMap() {
+				var myLatLng = {lat: 55.753559, lng: 37.609218};
+				var map = new google.maps.Map(document.getElementById('map'), {
+				    zoom: 10,
+				    center: myLatLng
+				  });
+				var marker = new google.maps.Marker({
+				    position: myLatLng,
+				    map: map,
+				});
+				marker.setMap(map);
+			}
+		</script>
+		<script async defer
+			src="https://maps.googleapis.com/maps/api/js?key{{ api_key }}&callback=initMap">
+		</script>
+	 
 	</div>
+	<div class="col-lg-4" style="background-color: #f2f2f2;">
+		<h2>Параметры поиска</h2>
+		<form method="POST" action="/real_estate/">
+			<h4 style="margin-top: 20px;">Тип недвижимости</h4>
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="AR" autocomplete="off">Аренда квартиры
+				</label>
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="AS" autocomplete="off">Покупка квартиры
+				</label>
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="RS" autocomplete="off">Покупка комнаты
+				</label>
+				<label class="btn btn-default">
+					<input type="radio" name="input_type" value="RR" autocomplete="off">Аренда комнаты
+				</label>
+			</div>
+			<h4>Количество комнат</h4>
+			<div class="btn-group" data-toggle="buttons">
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="Студия" autocomplete="off">Студия
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="1" autocomplete="off">1
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="2" autocomplete="off">2
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="3" autocomplete="off">3
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="4" autocomplete="off">4
+				</label>
+				<label class="btn btn-default">
+					<input type="checkbox" name="input_room" value="5" autocomplete="off">5+
+				</label>
+			</div>
+			<h4>Адрес</h4>
+			<div class="input-group" style="margin-bottom: 20px;">
+				<input name="input_address" type="text" class="form-control" placeholder="Введите улицу и дом" aria-describedby="basic-addon1">
+			</div>
+			<div class="btn-group btn-group-lg" role="group" aria-label="..." style="margin-bottom: 20px;">
+				<button type="submit" class="btn btn-block" href="/real_estate/">Начать поиск</button>
+			</div>
+		</form>
 
-	<div class="container">
-  		<h2>Ссылки</h2>
-  		<a href="/real_estate" type="button" class="btn btn-info" role="button">Недвижимость</a>  
-	</div>
-		
-
-	</div>
-</body>
-</html> -->
+	</div><!-- /.col-lg-4 -->
+</div>
+{%endblock%}

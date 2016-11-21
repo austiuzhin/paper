@@ -1,11 +1,9 @@
 {%extends "base.html"%}
-{%block head%}
-{{ super() }}
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='pagin.css') }}">
-{%endblock%}
 
 {%block page_content%}
+{{input_type}}
+{{input_room}}
+{{input_address}}
 {% if page > 1 %}
 	<a href="/real_estate/page/{{ page - 1 }}">Предыдущая</a>
 {% endif %}
@@ -27,14 +25,14 @@
 				{% for instance in data %}
 				<tbody>
 					<tr>
-						<td>{{ loop.index + (page - 1) * per_page }}</td>
+						<td>{{instance.id}}</td>
 						<td>{{instance.name}}</td>
 						<td>{{instance.obj_address}}</td>
 						<td>{{instance.rooms}}</td>
 						<td>{{instance.area}}</td>
 						<td>{{instance.floor}}</td>
 						<td>{{instance.metro_station}}</td>
-						<td>{{date_and_price[instance.id].price}}</td>
+						<td>{{date_and_price[instance.id-1].price}}</td>
 						<td><a href="{{instance.href}}" target="_blank">Ссылка</a></td>
 						<td>{{instance.source}}</td>
 					</tr>
