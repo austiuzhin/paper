@@ -1,4 +1,5 @@
 #-*-coding: UTF-8 -*-
+import random
 import codecs
 import json
 from os.path import isfile
@@ -10,11 +11,18 @@ def read_proxie_list(filename):
     if isfile(filename):
         with open(filename,'r',encoding = 'utf-8') as f:
             proxie_string =  f.read()
-        proxie_list = (proxie_string).split('\n')
-        proxies = dict()
-        for item in range(len(proxie_list)):
-            proxies.update({'http{}'.format(item):'{}'.format(proxie_list[item])})  
-        return proxies
+        proxie_list = (proxie_string).split('\n')          
+        return proxie_list
+    else:
+        return 'File not found'
+
+def read_socks_list(filename):
+    if isfile(filename):
+        with open(filename,'r',encoding = 'utf-8') as f:
+            proxie_string =  f.read()
+        proxie_list = (proxie_string).split('\n')        
+        proxie = {'http':'{}'.format(random.choice(proxie_list))}        
+        return proxie_list
     else:
         return 'File not found'
 
