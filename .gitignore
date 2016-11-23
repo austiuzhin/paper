@@ -12,3 +12,4 @@ app/venv/
 =======
 *.db
 >>>>>>> 0fe051abdacf03c0e04f4cda5fd5edb49cc9ab26
+*.sql
