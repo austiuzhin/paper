@@ -1,15 +1,17 @@
 {%extends "base.html"%}
 
-{%block page_content%}
-{% if page > 1 %}
-	<a href="/real_estate/page/{{ page - 1 }}">Предыдущая</a>
-{% endif %}
-	<a href="/real_estate/page/{{ page + 1 }}">Следующая</a>
+{%block head%}
+{{ super() }}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<style type="text/css">
+	/*html, body { height: 100%; margin: 0; padding: 0; }*/
+	#map { height: 400px; width:600px; }
+</style>
 
-<div class="container">
-	<h1>Квартиры и комнаты</h1>
-	<p style="font-family: verdana; font-size: 15" align="right">По состоянию на {{date_of_retrieval}}</p>
-</div>
+
+{%endblock%}
+
+{%block page_content%}
 
 <table class="table">
 		<thead>

@@ -2,7 +2,7 @@
 
 {%block head%}
 {{ super() }}
-
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <style type="text/css">
 	/*html, body { height: 100%; margin: 0; padding: 0; }*/
 	#map { height: 400px; width:600px; }
@@ -45,7 +45,7 @@
 	</div>
 	<div class="col-lg-4" style="background-color: #f2f2f2;">
 		<h2>Параметры поиска</h2>
-		<form method="POST" action="/real_estate/">
+		<form method="POST" action="/results">
 			<h4 style="margin-top: 20px;">Тип недвижимости</h4>
 			<div class="btn-group" data-toggle="buttons">
 				<label class="btn btn-default">
@@ -87,7 +87,7 @@
 				<input name="input_address" type="text" class="form-control" placeholder="Введите улицу и дом" aria-describedby="basic-addon1">
 			</div>
 			<div class="btn-group btn-group-lg" role="group" aria-label="..." style="margin-bottom: 20px;">
-				<button type="submit" class="btn btn-block" href="/real_estate/">Начать поиск</button>
+				<button type="submit" class="btn btn-block" href="/results">Начать поиск</button>
 			</div>
 		</form>
 
