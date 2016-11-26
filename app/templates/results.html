@@ -19,26 +19,26 @@
 				<th>П\п</th>
 				<th>Наименование</th>
 				<th>Адрес</th>
-				<th>Количество комнат</th>
-				<th>Общая площадь</th>
+				<th>Расстояние пешком</th>
+				<th>Время ходьбы</th>
 				<th>Этаж</th>
 				<th>Станция метро</th>
 				<th>Цена</th>
 				<th>Ссылка</th>
 				<th>Источник</th>
-				{% for instance in data %}
+				{% for instance in range(total) %}
 				<tbody>
 					<tr>
-						<td>{{instance.id}}</td>
-						<td>{{instance.name}}</td>
-						<td>{{instance.obj_address}}</td>
-						<td>{{instance.rooms}}</td>
-						<td>{{instance.area}}</td>
-						<td>{{instance.floor}}</td>
-						<td>{{instance.metro_station}}</td>
-						<td>{{date_and_price[instance.id-1].price}}</td>
-						<td><a href="{{instance.href}}" target="_blank">Ссылка</a></td>
-						<td>{{instance.source}}</td>
+						<td>{{data[instance].id}}</td>
+						<td>{{data[instance].name}}</td>
+						<td>{{data[instance].obj_address}}</td>
+						<td>{{distance_text[instance]}}</td>
+						<td>{{duration_text[instance]}}</td>
+						<td>{{data[instance].floor}}</td>
+						<td>{{data[instance].metro_station}}</td>
+						<td>{{date_and_price[instance].price}}</td>
+						<td><a href="{{data[instance].href}}" target="_blank">Ссылка</a></td>
+						<td>{{data[instance].source}}</td>
 					</tr>
 				</tbody>
 				{%endfor%}
